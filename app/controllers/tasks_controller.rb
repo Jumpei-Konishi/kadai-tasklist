@@ -2,33 +2,29 @@ class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy]
   before_action :require_user_logged_in
   
-  def index
-    @tasks = Task.all
-  end
-  
-  def show
-  end
-  
   def new
-    @task = Task.new
+    @task = current_user.tasks.new
   end
   
   def create
-    @task = Task.new(task_params)
+    @task = current_user.tasks.build(task_params)
     if @task.save
       flash[:success] = 'Task が正常に作成されました'
-      redirect_to @task
+      redirect_to root_path
     else
       flash.now[:danger] = 'Task が作成されませんでした'
       render :new
     end
   end
   
+  def show
+  end
+  
   def edit
   end
   
   def update
-    if @task.update(task_params)
+    if current_user.tasks.update(task_params)
       flash[:success] = 'Taskは正常に更新されました'
       redirect_to @task
     else
@@ -41,13 +37,13 @@ class TasksController < ApplicationController
     @task.destroy
     
     flash[:success] = 'Taskは正常に削除されました'
-    redirect_to tasks_url
+    redirect_to root_url
   end
   
   private
   
   def set_task
-    @task = Task.find(params[:id])
+    @task = current_user.tasks.find(params[:id])
   end
   
   def task_params
